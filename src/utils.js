@@ -1,4 +1,24 @@
 'use strict';
+// Подключаем модуль `fs`
+const fs = require(`fs`).promises;
+/**
+ * 
+ * @param {
+ * } filePath 
+ * @returns 
+ */
+
+const readContent = async (filePath) => {
+  try {
+    const content = await fs.readFile(filePath, `utf8`);
+    return content
+        .split(`\n`)
+        .map((str) => str.trim())
+  } catch (err) {
+      console.error(err);
+    return [];
+  }
+};
 
 /**
  * Перетасовка массива по алгоритму
@@ -50,4 +70,5 @@ module.exports = {
     getPictureFileName,
     getRandomInt,
     shuffle,
+    readContent,
   };
