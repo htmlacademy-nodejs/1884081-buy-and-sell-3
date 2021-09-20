@@ -4,6 +4,7 @@ const {
     getPictureFileName,
     getRandomInt,
     shuffle,
+    readContent,
   } = require(`../../utils`);
 
 // Подключаем модуль `fs`
@@ -12,9 +13,9 @@ const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
 
 const { 
-    CATEGORIES,
-    SENTENCES,
-    TITLES,
+    FILE_PATH_SENTENCES,
+    FILE_PATH_TITLES,
+    FILE_PATH_CATEGORIES,
     PictureRestrict,
     OfferType,
     SumRestrict,
@@ -24,12 +25,12 @@ const {
   } = require(`../../constants`);
   
 
-const generateOffers = (count) => (
+const generateOffers = (count, sentences, titles, categories) => (
     Array(count).fill({}).map(() => ({
-      category: [CATEGORIES.slice(getRandomInt(0, CATEGORIES.length - 1))],
-      description: shuffle(SENTENCES).slice(1, 5).join(` `),
+      category: [categories.slice(getRandomInt(0, categories.length - 1))],
+      description: shuffle(sentences).slice(1, 5).join(` `),
       picture: getPictureFileName(getRandomInt(PictureRestrict.MIN, PictureRestrict.MAX)),
-      title: TITLES[getRandomInt(0, TITLES.length - 1)],
+      title: titles[getRandomInt(0, titles.length - 1)],
       type: OfferType[Object.keys(OfferType)[Math.floor(Math.random() * Object.keys(OfferType).length)]],
       sum: getRandomInt(SumRestrict.MIN, SumRestrict.MAX),
     }))
@@ -41,12 +42,17 @@ module.exports = {
     const [count] = args;
     const countOffer = Number.parseInt(count, 10) || DEFAULT_COUNT;
 
+    console.log(FILE_PATH_SENTENCES)
+    const sentences = await readContent(FILE_PATH_SENTENCES)
+    const titles = await readContent(FILE_PATH_TITLES)
+    const categories = await readContent(FILE_PATH_CATEGORIES)
+
     if ( countOffer > 1000 ) {
          console.error(chalk.red(`Не больше 1000 объявлений`));
          return  process.exit(ExitCode.error);
     }
 
-    const content = JSON.stringify(generateOffers(countOffer));
+    const content = JSON.stringify(generateOffers(countOffer, sentences, titles, categories));
 
 
 try {
